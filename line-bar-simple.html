@@ -1,0 +1,138 @@
+<!--
+	此示例下载自 https://echarts.apache.org/examples/zh/editor.html?c=bar-simple&code=G4QwTgBAFg9grmAzhAvBA2gXQNwChSQBmcANiQCIgAuIqGO-4EAlgHYDGYApgLZes0K1Wmix4CEAEYhEXAGKkSdAIwAGdXlwB6LRED4roAQjCGoiBKTUAhboHgdQG-mgB1NAdsaAIf5MAqCACYALHS-qINwEh_xkhEGjAqSiouOlYuAHcISK4ACgByd1V3AFYAWlVlPOUAFXUALjL1VIBKPEIYSGSJZjpVbBYIAB4PT1aWAGo-qogAb1wICAl2BG4BJJj4xOoU0PAIpYA6AHMuKiLmPmShvva3ADY_M4vjdVUaiB0IQHnrG0A8jUACpTGJpjqwHmoogAmczQUzAMzWUXWVBgAEkAMoAeThVDAbE2h3WiBIzHYKVUABpjABmKrrbgABxIIFxaSKqUJqQg1TaD0APBaAeH1AGjKgC45CAAIgAmkKBTkALKinLkcgQAASMr5n1gCEQ63JcEQUGSPz-VEBSRquE-TQ43D4AjoouoUHWhBIMHqyUtVGtYBArABMB4hwgbmUGQgOQ8txZuhegHnEz5sTi8fiCSIgVXqzVR02xg2faSyBRkCB9NApmMCEMQQAWihHxsQyPHExrkpn5IoDQBfQ0wclUZgwVh0UbjaEwEgd8mlEafPuozbbMAj1IgAAezEQqU-TfxnxIXG27pHvfGEABwhH6FSZfpTPDqUwK7X4znAEEF4gd2OIFQAJ7krgz9hLTb1N_0i-B40COSpIDee7zouAAyICSFwJDPnue7av8XDThAxAcB2XYQI0IAkHAXBDLuyHjNwVAIN2oCEVwxYcpy1iAC-pgB8ZoAXJ4vuMLbIdxECrp8wEgAAWvaPBHi-pF7u-n4zmwiDMACXCAWREArOEI4AJwEpxED8ACI5qKoL78chknjGpVAjtpKl6SOGTGZ8mAQW-D6LuJpk6dJX5MjRRHKWRrAgHwM6nhByHkjA8k4awM4boQVD-chUGILB8GIaOKkVvUOpRBhqTDL5XBNsuKkmWRiA_huI4okRxlhRlZFeTOhWJXugXBeeYateMEVRZ2MVMhOUAJfV4zJalCFIZlqG6uhM4FQRRHFTpZXIRVBHeYQBGyA54xOZ8siolwT4YBJOntd5J5daNr4fpd2KxN1EAuY-MLulwc5WTdgkjpWQg0DdiA8PazrVWAtU8fVZkQBdM4XjdTVMtIYBPS9i5vYpn3GN9h4sCahZxsIgPAzAoOYdtXC7RAV5NtgQA
+	⚠ 请注意，该图表不是 Apache ECharts 官方示例，而是由用户代码生成的。请注意鉴别其内容。
+-->
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+  <meta charset="utf-8">
+</head>
+<body style="height: 100%; margin: 0">
+  <div id="container" style="height: 100%"></div>
+
+  
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.6.0/files/dist/echarts.min.js"></script>
+  
+  <!-- Uncomment this line if you want to dataTool extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.6.0/files/dist/extension/dataTool.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to use gl extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-gl/2/files/dist/echarts-gl.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to echarts-stat extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-stat/latest/files/dist/ecStat.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to echarts-graph-modularity extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-graph-modularity/2/files/dist/echarts-graph-modularity.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to use map
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/4.9.0/files/map/js/world.js"></script>
+  -->
+  <!-- Uncomment these two lines if you want to use bmap extension
+  <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=YOUR_API_KEY"></script>
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.6.0/files/dist/extension/bmap.min.js"></script>
+  -->
+
+  <script type="text/javascript">
+    var dom = document.getElementById('container');
+    var myChart = echarts.init(dom, null, {
+      renderer: 'canvas',
+      useDirtyRect: false
+    });
+    var app = {};
+    
+    var option;
+
+    var hours = [];
+var fullData = [];
+var incrementalData = [];
+var baseFull = 1000;
+
+// 生成 10 天的小时数据（10 * 24 = 240 小时）
+var startDate = new Date('2025-01-01T00:00:00');
+for (var i = 0; i < 240; i++) {
+  var currentDate = new Date(startDate.getTime() + i * 60 * 60 * 1000); // 每小时增加
+  var formattedDate = currentDate.toISOString().slice(0, 13).replace('T', ' '); // 格式化为 "YYYY-MM-DD HH"
+  hours.push(formattedDate);
+
+  var increment = Math.floor(Math.random() * 120 - 20); // 增量
+  incrementalData.push(increment);
+
+  baseFull += increment; // 全量
+  fullData.push(baseFull);
+}
+
+option = {
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    data: ['全量', '增量']
+  },
+  xAxis: {
+    type: 'category',
+    data: hours,
+    axisLabel: {
+      formatter: function (value) {
+        return value; // 格式化时间显示
+      }
+    }
+  },
+  dataZoom: [
+    {
+      type: 'inside',
+      start: 90,
+      end: 100
+    },
+    {
+      start: 0,
+      end: 20
+    }
+  ],
+  yAxis: [
+    {
+      type: 'value',
+      name: '全量',
+      position: 'left',
+      axisLabel: {
+        formatter: '{value}'
+      },
+      scale: true
+    },
+    {
+      type: 'value',
+      name: '增量',
+      position: 'right',
+      axisLabel: {
+        formatter: '{value}'
+      },
+      scale: false
+    }
+  ],
+  series: [
+    {
+      name: '全量',
+      type: 'line',
+      yAxisIndex: 0,
+      data: fullData,
+      smooth: true
+    },
+    {
+      name: '增量',
+      type: 'bar',
+      yAxisIndex: 1,
+      data: incrementalData,
+      smooth: false
+    }
+  ]
+};
+
+
+    if (option && typeof option === 'object') {
+      myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+  </script>
+</body>
+</html>
