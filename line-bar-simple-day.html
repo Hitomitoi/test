@@ -14,9 +14,6 @@
       renderer: 'canvas',
       useDirtyRect: false
     });
-    var app = {};
-    
-    var option;
 
     var days = [];
     var fullData = [];
@@ -40,7 +37,7 @@
       fullData.push(baseFull);
     }
 
-    option = {
+    var option = {
       tooltip: {
         trigger: 'axis'
       },
@@ -100,7 +97,12 @@
           type: 'bar',
           yAxisIndex: 1,
           data: incrementalData,
-          smooth: false
+          smooth: false,
+          itemStyle: {
+            color: function (params) {
+              return params.value < 0 ? '#F53F3F' : '#0FC6C2';
+            }
+          }
         }
       ]
     };
