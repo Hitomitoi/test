@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #main {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="main"></div>
+
+  <script>
+    fetch('https://geo.datav.aliyun.com/areas_v3/bound/330000_full.json')
+      .then(res => res.json())
+      .then(geoJson => {
+        echarts.registerMap('浙江', geoJson);
+        var chart = echarts.init(document.getElementById('main'));
+
+        var rawData = [
+          { name: '杭州市', value: 300, causes: [ { name: '肺癌', percent: 15.7 }, { name: '肝心病', percent: 12.4 }, { name: '肝癌', percent: 10.1 } ] },
+          { name: '宁波市', value: 260, causes: [ { name: '肺癌', percent: 14.5 }, { name: '脑梗', percent: 11.8 }, { name: '心脏病', percent: 9.3 } ] },
+          { name: '温州市', value: 220, causes: [ { name: '肝癌', percent: 13.2 }, { name: '肺癌', percent: 12.1 }, { name: '中风', percent: 10.4 } ] },
+          { name: '嘉兴市', value: 180, causes: [ { name: '肺癌', percent: 12.6 }, { name: '心衰', percent: 11.3 }, { name: '脑出血', percent: 8.7 } ] },
+          { name: '湖州市', value: 150, causes: [ { name: '肝癌', percent: 14.2 }, { name: '糖尿病', percent: 10.3 }, { name: '肺癌', percent: 9.4 } ] },
+          { name: '绍兴市', value: 170, causes: [ { name: '肺癌', percent: 13.9 }, { name: '胃癌', percent: 11.6 }, { name: '脑梗', percent: 9.1 } ] },
+          { name: '金华市', value: 200, causes: [ { name: '脑梗', percent: 14.7 }, { name: '肺癌', percent: 13.3 }, { name: '心衰', percent: 9.9 } ] },
+          { name: '衢州市', value: 120, causes: [ { name: '肺癌', percent: 12.4 }, { name: '心脏病', percent: 10.8 }, { name: '糖尿病', percent: 8.2 } ] },
+          { name: '舟山市', value: 90, causes: [ { name: '脑梗', percent: 10.9 }, { name: '肺癌', percent: 9.6 }, { name: '糖尿病', percent: 8.5 } ] },
+          { name: '台州市', value: 210, causes: [ { name: '肝癌', percent: 13.4 }, { name: '肺癌', percent: 11.7 }, { name: '脑出血', percent: 10.3 } ] },
+          { name: '丽水市', value: 110, causes: [ { name: '肺癌', percent: 11.5 }, { name: '肝癌', percent: 10.9 }, { name: '脑梗', percent: 9.2 } ] }
+        ];
+
+        var formattedData = rawData.map(item => {
+          var lines = [`${item.name} ${item.value}人`];
+          item.causes.forEach(c => {
+            lines.push(`${c.name} ${c.percent.toFixed(1)}%`);
+          });
+          return {
+            name: item.name,
+            value: item.value,
+            label: {
+              formatter: lines.join('\n')
+            }
+          };
+        });
+
+        var option = {
+          tooltip: {
+            trigger: 'item',
+            formatter: function (params) {
+              var match = rawData.find(item => item.name === params.name);
+              if (!match) return `${params.name}：无数据`;
+
+              var lines = [`<strong>${match.name}</strong>`, `死亡人数：${match.value}人`];
+              match.causes.forEach(c => {
+                lines.push(`${c.name}：${c.percent.toFixed(1)}%`);
+              });
+              return lines.join('<br/>');
+            }
+          },
+          visualMap: {
+            min: 0,
+            max: 350,
+            left: 'left',
+            bottom: '10%',
+            text: ['高', '低'],
+            calculable: true,
+            inRange: {
+              color: ['#E0F0FF', '#4B93FF']
+            }
+          },
+          series: [
+            {
+              name: '死亡人数',
+              type: 'map',
+              map: '浙江',
+              roam: true,
+              label: {
+                show: true,
+                fontSize: 11,
+                formatter: function (params) {
+                  return params.data?.label?.formatter || '';
+                }
+              },
+              data: formattedData
+            }
+          ]
+        };
+
+        chart.setOption(option);
+
+        // 响应式调整
+        window.addEventListener('resize', function () {
+          chart.resize();
+        });
+      });
+  </script>
+</body>
+</html>

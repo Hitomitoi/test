@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #main {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="main"></div>
+
+  <script>
+    var chart = echarts.init(document.getElementById('main'));
+
+    var rawData = [
+      { cause: "肺癌", value: 42 },
+      { cause: "肺心病", value: 38 },
+      { cause: "肝癌", value: 32 },
+      { cause: "动脉硬化性心脏病", value: 28 },
+      { cause: "脑出血", value: 24 },
+      { cause: "坠积性肺炎", value: 20 },
+      { cause: "支气管或肺，未特指", value: 18 },
+      { cause: "脑梗死后遗症", value: 15 },
+      { cause: "脑梗死，未特指", value: 13 },
+      { cause: "急性心肌梗死", value: 10 }
+    ];
+
+    var total = rawData.reduce((sum, item) => sum + item.value, 0);
+    rawData.sort((a, b) => b.value - a.value);
+
+    var causes = rawData.map(item => item.cause);
+    var values = rawData.map(item => item.value);
+    var percents = rawData.map(item => ((item.value / total) * 100).toFixed(1));
+
+    var option = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: function (params) {
+          var p = params[0];
+          var idx = p.dataIndex;
+          return `
+            死因：${causes[idx]}<br/>
+            人数：${p.value} 人 (${percents[idx]}%)
+          `;
+        }
+      },
+      grid: {
+        left: 100,
+        right: 40,
+        top: 40,
+        bottom: 40,
+        containLabel: true
+      },
+      xAxis: {
+        type: 'value',
+        name: '人数',
+        axisLabel: {
+          formatter: '{value}人'
+        }
+      },
+      yAxis: {
+        type: 'category',
+        inverse: true,
+        data: causes
+      },
+      series: [
+        {
+          name: '死因',
+          type: 'bar',
+          data: values,
+          label: {
+            show: true,
+            position: 'right',
+            formatter: function (params) {
+              var idx = params.dataIndex;
+              return `${params.value}人\n(${percents[idx]}%)`;
+            }
+          },
+          itemStyle: {
+            color: '#4B93FF'
+          }
+        }
+      ]
+    };
+
+    chart.setOption(option);
+
+    // 添加响应式处理
+    window.addEventListener('resize', function () {
+      chart.resize();
+    });
+  </script>
+</body>
+</html>

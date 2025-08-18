@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #main {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="main"></div>
+
+  <script>
+    var chart = echarts.init(document.getElementById('main'));
+
+    var causes = [
+      "肺癌", "肺心病", "坠积性肺炎", "动脉硬化性心脏病", "支气管或肺，未特指",
+      "肝癌", "脑梗死，未特指", "脑出血", "脑梗死后遗症", "急性心肌梗死"
+    ];
+
+    var maleRaw = [
+      { cause: "肺癌", value: 35 },
+      { cause: "肺心病", value: 28 },
+      { cause: "肝癌", value: 22 },
+      { cause: "动脉硬化性心脏病", value: 18 },
+      { cause: "脑出血", value: 16 },
+      { cause: "支气管或肺，未特指", value: 14 },
+      { cause: "脑梗死后遗症", value: 12 },
+      { cause: "坠积性肺炎", value: 10 },
+      { cause: "脑梗死，未特指", value: 8 },
+      { cause: "急性心肌梗死", value: 6 },
+    ];
+
+    var femaleRaw = [
+      { cause: "脑梗死，未特指", value: 30 },
+      { cause: "肺癌", value: 25 },
+      { cause: "脑梗死后遗症", value: 22 },
+      { cause: "动脉硬化性心脏病", value: 20 },
+      { cause: "坠积性肺炎", value: 18 },
+      { cause: "急性心肌梗死", value: 16 },
+      { cause: "脑出血", value: 14 },
+      { cause: "支气管或肺，未特指", value: 12 },
+      { cause: "肺心病", value: 10 },
+      { cause: "肝癌", value: 8 },
+    ];
+
+    var totalMale = maleRaw.reduce((sum, item) => sum + item.value, 0);
+    var totalFemale = femaleRaw.reduce((sum, item) => sum + item.value, 0);
+
+    maleRaw.sort((a, b) => b.value - a.value);
+    femaleRaw.sort((a, b) => b.value - a.value);
+
+    var maleCauses = maleRaw.map(item => item.cause);
+    var maleValues = maleRaw.map(item => -item.value);
+    var malePercents = maleRaw.map(item => ((item.value / totalMale) * 100).toFixed(1));
+
+    var femaleCauses = femaleRaw.map(item => item.cause);
+    var femaleValues = femaleRaw.map(item => item.value);
+    var femalePercents = femaleRaw.map(item => ((item.value / totalFemale) * 100).toFixed(1));
+
+    var option = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: function (params) {
+          var male = params[0];
+          var female = params[1];
+          var idx = male.dataIndex;
+          return `
+            <strong>男性</strong><br/>
+            死因：${maleCauses[idx]}<br/>
+            人数：${Math.abs(male.value)} 人 (${malePercents[idx]}%)<br/><br/>
+            <strong>女性</strong><br/>
+            死因：${femaleCauses[idx]}<br/>
+            人数：${female.value} 人 (${femalePercents[idx]}%)
+          `;
+        }
+      },
+      legend: {
+        top: 20,
+        data: ['男性', '女性']
+      },
+      grid: {
+        top: 60,
+        bottom: 40,
+        containLabel: true
+      },
+      xAxis: {
+        type: 'value',
+        min: -40,
+        max: 40,
+        axisLabel: {
+          formatter: function (val) {
+            return Math.abs(val) + '人';
+          }
+        }
+      },
+      yAxis: [
+        {
+          type: 'category',
+          inverse: true,
+          data: maleCauses,
+          position: 'left',
+          axisLabel: {
+            align: 'right',
+            padding: [0, 10, 0, 0]
+          }
+        },
+        {
+          type: 'category',
+          inverse: true,
+          data: femaleCauses,
+          position: 'right',
+          axisLabel: {
+            align: 'left',
+            padding: [0, 0, 0, 10]
+          }
+        }
+      ],
+      series: [
+        {
+          name: '男性',
+          type: 'bar',
+          data: maleValues,
+          yAxisIndex: 0,
+          label: {
+            show: true,
+            position: 'insideLeft',
+            formatter: function (params) {
+              var idx = params.dataIndex;
+              return `${Math.abs(params.value)}人\n(${malePercents[idx]}%)`;
+            }
+          },
+          itemStyle: {
+            color: '#C0D3FF'
+          }
+        },
+        {
+          name: '女性',
+          type: 'bar',
+          data: femaleValues,
+          yAxisIndex: 1,
+          label: {
+            show: true,
+            position: 'insideRight',
+            formatter: function (params) {
+              var idx = params.dataIndex;
+              return `${params.value}人\n(${femalePercents[idx]}%)`;
+            }
+          },
+          itemStyle: {
+            color: '#C0EFEF'
+          }
+        }
+      ]
+    };
+
+    chart.setOption(option);
+
+    // 响应式
+    window.addEventListener('resize', function () {
+      chart.resize();
+    });
+  </script>
+</body>
+</html>
